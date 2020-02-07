@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
         buttonInsert = findViewById(R.id.buttonInsert);
         buttonClear = findViewById(R.id.buttonClear);
         aSwitchCardView = findViewById(R.id.switchCardView);
-        myAdapter1 = new MyAdapter(false);
-        myAdapter2 = new MyAdapter(true);
+        myAdapter1 = new MyAdapter(false, wordViewModel);
+        myAdapter2 = new MyAdapter(true, wordViewModel);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myAdapter1);

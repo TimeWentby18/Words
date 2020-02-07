@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -17,9 +18,11 @@ import java.util.List;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private boolean useCardView;
     List<Word> allWords = new ArrayList<>();
+    WordViewModel wordViewModel;
 
-    public MyAdapter(boolean useCardView) {
+    public MyAdapter(boolean useCardView, WordViewModel wordViewModel) {
         this.useCardView = useCardView;
+        this.wordViewModel = wordViewModel;
     }
 
     public void setAllWords(List<Word> allWords) {
@@ -41,7 +44,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        Word word = allWords.get(position);
+        final Word word = allWords.get(position);
         holder.textViewNumber.setText(String.valueOf(position + 1));
         holder.textViewEnglish.setText(word.getWord());
         holder.textViewChinese.setText(word.getEnglishMeaning());
@@ -53,6 +56,29 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(uri);
                 holder.itemView.getContext().startActivity(intent);
+            }
+        });
+
+        holder.aSwitchChineseInvisible.setOnCheckedChangeListener(null);
+        if (word.isChineseInvisible()) {
+            holder.textViewChinese.setVisibility(View.GONE);
+            holder.aSwitchChineseInvisible.setChecked(true);
+        } else {
+            holder.textViewChinese.setVisibility(View.VISIBLE);
+            holder.aSwitchChineseInvisible.setChecked(false);
+        }
+        holder.aSwitchChineseInvisible.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    holder.textViewChinese.setVisibility(View.GONE);
+                    word.setChineseInvisible(true);
+                    wordViewModel.updateWords(word);
+                } else {
+                    holder.textViewChinese.setVisibility(View.VISIBLE);
+                    word.setChineseInvisible(false);
+                    wordViewModel.updateWords(word);
+                }
             }
         });
     }
