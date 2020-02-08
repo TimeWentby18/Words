@@ -20,9 +20,9 @@ public interface WordDao {
     @Delete
     void deleteWords(Word... words);
 
-    @Query("DELETE FROM word")
+    @Query("DELETE FROM WORD")
     void deleteAllWords();
 
-    @Query("SELECT * FROM word ORDER BY id DESC")
+    @Query("SELECT * FROM WORD ORDER BY ID DESC")
     LiveData<List<Word>> getAllWordsLive();
 }

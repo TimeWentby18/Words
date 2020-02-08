@@ -49,10 +49,13 @@ public class MainActivity extends AppCompatActivity {
         wordViewModel.getAllWords().observe(this, new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
+                int temp = myAdapter1.getItemCount();
                 myAdapter1.setAllWords(words);
-                myAdapter1.notifyDataSetChanged();
                 myAdapter2.setAllWords(words);
-                myAdapter2.notifyDataSetChanged();
+                if (temp != words.size()) {
+                    myAdapter1.notifyDataSetChanged();
+                    myAdapter2.notifyDataSetChanged();
+                }
             }
         });
 

@@ -7,12 +7,12 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-public class WordRepository {
+class WordRepository {
     private WordDao wordDao;
     private LiveData<List<Word>> allWordsLive;
 
-    public WordRepository(Context context) {
-        WordDatabase wordDatabase = WordDatabase.getWordDatabase(context);
+    WordRepository(Context context) {
+        WordDatabase wordDatabase = WordDatabase.getWordDatabase(context.getApplicationContext());
         wordDao = wordDatabase.getWordDao();
         allWordsLive = wordDao.getAllWordsLive();
     }
@@ -40,7 +40,7 @@ public class WordRepository {
     static class InsertAsyncTask extends AsyncTask<Word, Void, Void> {
         WordDao wordDao;
 
-        public InsertAsyncTask(WordDao wordDao) {
+        InsertAsyncTask(WordDao wordDao) {
             this.wordDao = wordDao;
         }
 
@@ -54,7 +54,7 @@ public class WordRepository {
     static class UpdateAsyncTask extends AsyncTask<Word, Void, Void> {
         WordDao wordDao;
 
-        public UpdateAsyncTask(WordDao wordDao) {
+        UpdateAsyncTask(WordDao wordDao) {
             this.wordDao = wordDao;
         }
 
@@ -68,7 +68,7 @@ public class WordRepository {
     static class DeleteAsyncTask extends AsyncTask<Word, Void, Void> {
         WordDao wordDao;
 
-        public DeleteAsyncTask(WordDao wordDao) {
+        DeleteAsyncTask(WordDao wordDao) {
             this.wordDao = wordDao;
         }
 
@@ -82,7 +82,7 @@ public class WordRepository {
     static class ClearAsyncTask extends AsyncTask<Void, Void, Void> {
         WordDao wordDao;
 
-        public ClearAsyncTask(WordDao wordDao) {
+        ClearAsyncTask(WordDao wordDao) {
             this.wordDao = wordDao;
         }
 

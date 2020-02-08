@@ -8,27 +8,27 @@ import androidx.room.PrimaryKey;
 public class Word {
     @PrimaryKey(autoGenerate = true)
     private int id;
-    @ColumnInfo(name = "chinese_word")
+    @ColumnInfo(name = "english_word")
     private String word;
-    @ColumnInfo(name = "english_meaning")
-    private String englishMeaning;
+    @ColumnInfo(name = "chinese_meaning")
+    private String chineseMeaning;
     @ColumnInfo(name = "chinese_invisible")
     private boolean chineseInvisible;
 
-    public Word(String word, String englishMeaning) {
+    Word(String word, String chineseMeaning) {
         this.word = word;
-        this.englishMeaning = englishMeaning;
+        this.chineseMeaning = chineseMeaning;
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    void setId(int id) {
         this.id = id;
     }
 
-    public String getWord() {
+    String getWord() {
         return word;
     }
 
@@ -36,19 +36,19 @@ public class Word {
         this.word = word;
     }
 
-    public String getEnglishMeaning() {
-        return englishMeaning;
+    public String getChineseMeaning() {
+        return chineseMeaning;
     }
 
-    public void setEnglishMeaning(String englishMeaning) {
-        this.englishMeaning = englishMeaning;
+    public void setChineseMeaning(String chineseMeaning) {
+        this.chineseMeaning = chineseMeaning;
     }
 
-    public boolean isChineseInvisible() {
+    boolean isChineseInvisible() {
         return chineseInvisible;
     }
 
-    public void setChineseInvisible(boolean chineseInvisible) {
+    void setChineseInvisible(boolean chineseInvisible) {
         this.chineseInvisible = chineseInvisible;
     }
 }

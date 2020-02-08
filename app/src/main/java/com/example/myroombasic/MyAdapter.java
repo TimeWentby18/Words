@@ -17,15 +17,15 @@ import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private boolean useCardView;
-    List<Word> allWords = new ArrayList<>();
-    WordViewModel wordViewModel;
+    private List<Word> allWords = new ArrayList<>();
+    private WordViewModel wordViewModel;
 
-    public MyAdapter(boolean useCardView, WordViewModel wordViewModel) {
+    MyAdapter(boolean useCardView, WordViewModel wordViewModel) {
         this.useCardView = useCardView;
         this.wordViewModel = wordViewModel;
     }
 
-    public void setAllWords(List<Word> allWords) {
+    void setAllWords(List<Word> allWords) {
         this.allWords = allWords;
     }
 
@@ -35,9 +35,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View itemView;
         if (useCardView) {
-            itemView = layoutInflater.inflate(R.layout.cell_card, parent);
+            itemView = layoutInflater.inflate(R.layout.cell_card, parent, false);
         } else {
-            itemView = layoutInflater.inflate(R.layout.cell_normal, parent);
+            itemView = layoutInflater.inflate(R.layout.cell_normal, parent, false);
         }
         return new MyViewHolder(itemView);
     }
@@ -47,7 +47,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         final Word word = allWords.get(position);
         holder.textViewNumber.setText(String.valueOf(position + 1));
         holder.textViewEnglish.setText(word.getWord());
-        holder.textViewChinese.setText(word.getEnglishMeaning());
+        holder.textViewChinese.setText(word.getChineseMeaning());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +91,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textViewNumber, textViewEnglish, textViewChinese;
         Switch aSwitchChineseInvisible;
-        public MyViewHolder(@NonNull View itemView) {
+        MyViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewNumber = itemView.findViewById(R.id.textViewNumber);
             textViewEnglish = itemView.findViewById(R.id.textViewEnglish);
