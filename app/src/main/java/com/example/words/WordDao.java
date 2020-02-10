@@ -1,4 +1,4 @@
-package com.example.myroombasic;
+package com.example.words;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
