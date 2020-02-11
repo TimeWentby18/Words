@@ -6,6 +6,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.inputmethod.InputMethodManager;
 
 public class MainActivity extends AppCompatActivity {
     private NavController navController;
@@ -18,8 +20,16 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController);
     }
 
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+
     @Override
     public boolean onSupportNavigateUp() {
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(findViewById(R.id.fragment).getWindowToken(), 0);
         navController.navigateUp();
         return super.onSupportNavigateUp();
     }
