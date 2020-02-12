@@ -31,4 +31,7 @@ public class WordViewModel extends AndroidViewModel {
     LiveData<List<Word>> getAllWords() {
         return wordRepository.getAllWordsLive();
     }
+    LiveData<List<Word>> findWordsWithPattern(String pattern) {
+        return wordRepository.findWordsWithPattern(pattern);
+    }
 }
