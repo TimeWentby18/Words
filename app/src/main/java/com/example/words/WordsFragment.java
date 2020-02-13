@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -109,15 +110,13 @@ public class WordsFragment extends Fragment {
                 String pattern = newText.trim();
                 filteredWords.removeObservers(requireActivity()); //...
                 filteredWords = wordViewModel.findWordsWithPattern(pattern);
-                filteredWords.observe(requireActivity(), new Observer<List<Word>>() {
+                filteredWords.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
                     @Override
                     public void onChanged(List<Word> words) {
                         int temp = myAdapter1.getItemCount();
-                        myAdapter1.setAllWords(words);
-                        myAdapter2.setAllWords(words);
                         if (temp != words.size()) {
-                            myAdapter1.notifyDataSetChanged();
-                            myAdapter2.notifyDataSetChanged();
+                            myAdapter1.submitList(words);
+                            myAdapter2.submitList(words);
                         }
                     }
                 });
@@ -134,6 +133,23 @@ public class WordsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));
         myAdapter1 = new MyAdapter(false, wordViewModel);
         myAdapter2 = new MyAdapter(true, wordViewModel);
+        recyclerView.setItemAnimator(new DefaultItemAnimator() {
+            @Override
+            public void onAnimationFinished(@NonNull RecyclerView.ViewHolder viewHolder) {
+                super.onAnimationFinished(viewHolder);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (linearLayoutManager != null) {
+                    int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
+                    int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
+                    for (int i = firstPosition; i <= lastPosition; i++) {
+                        MyAdapter.MyViewHolder holder = (MyAdapter.MyViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+                        if (holder != null) {
+                            holder.textViewNumber.setText(String.valueOf(i + 1));
+                        }
+                    }
+                }
+            }
+        });
         SharedPreferences shp = requireActivity().getSharedPreferences(VIEW_TYPE_SHP, Context.MODE_PRIVATE);
         boolean viewType = shp.getBoolean(IS_USING_CARD_VIEW, false);
         if (viewType) {
@@ -142,15 +158,14 @@ public class WordsFragment extends Fragment {
             recyclerView.setAdapter(myAdapter1);
         }
         filteredWords = wordViewModel.getAllWords();
-        filteredWords.observe(requireActivity(), new Observer<List<Word>>() {
+        filteredWords.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
                 int temp = myAdapter1.getItemCount();
-                myAdapter1.setAllWords(words);
-                myAdapter2.setAllWords(words);
                 if (temp != words.size()) {
-                    myAdapter1.notifyDataSetChanged();
-                    myAdapter2.notifyDataSetChanged();
+                    recyclerView.smoothScrollBy(0, -200);
+                    myAdapter1.submitList(words);
+                    myAdapter2.submitList(words);
                 }
             }
         });
