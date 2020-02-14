@@ -3,14 +3,6 @@ package com.example.words;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -20,7 +12,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.words.R;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +39,7 @@ public class AddFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_add, container, false);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -53,6 +51,7 @@ public class AddFragment extends Fragment {
         buttonSubmit.setEnabled(false);
         editTextEnglish.requestFocus();
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.showSoftInput(editTextEnglish, 0);
 
         TextWatcher textWatcher = new TextWatcher() {
@@ -86,6 +85,7 @@ public class AddFragment extends Fragment {
                 NavController navController = Navigation.findNavController(v);
                 navController.navigateUp();
                 InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });

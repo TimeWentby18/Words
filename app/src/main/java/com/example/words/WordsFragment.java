@@ -136,6 +136,7 @@ public class WordsFragment extends Fragment {
         });
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

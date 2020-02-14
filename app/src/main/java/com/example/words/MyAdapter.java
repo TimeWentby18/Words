@@ -14,9 +14,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MyAdapter extends ListAdapter<Word, MyAdapter.MyViewHolder> {
     private boolean useCardView;
     private WordViewModel wordViewModel;

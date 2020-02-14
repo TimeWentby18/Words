@@ -1,13 +1,12 @@
 package com.example.words;
 
+import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.inputmethod.InputMethodManager;
 
 public class MainActivity extends AppCompatActivity {
     private NavController navController;
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.hideSoftInputFromWindow(findViewById(R.id.fragment).getWindowToken(), 0);
         navController.navigateUp();
         return super.onSupportNavigateUp();

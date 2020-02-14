@@ -36,12 +36,8 @@ public class Word {
         this.word = word;
     }
 
-    public String getChineseMeaning() {
+    String getChineseMeaning() {
         return chineseMeaning;
-    }
-
-    public void setChineseMeaning(String chineseMeaning) {
-        this.chineseMeaning = chineseMeaning;
     }
 
     boolean isChineseInvisible() {
