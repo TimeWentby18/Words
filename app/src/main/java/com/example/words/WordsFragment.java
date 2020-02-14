@@ -5,10 +5,22 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -16,19 +28,13 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.SearchView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -39,10 +45,12 @@ public class WordsFragment extends Fragment {
     private WordViewModel wordViewModel;
     private RecyclerView recyclerView;
     private MyAdapter myAdapter1, myAdapter2;
-    private FloatingActionButton floatingActionButton;
     private LiveData<List<Word>> filteredWords;
     private static final String VIEW_TYPE_SHP = "view_type_shp";
     private static final String IS_USING_CARD_VIEW = "is_using_card_view";
+    private List<Word> allWords;
+    private boolean undoAction;
+    private DividerItemDecoration dividerItemDecoration;
 
     public WordsFragment() {
         // Required empty public constructor
@@ -83,9 +91,11 @@ public class WordsFragment extends Fragment {
                 SharedPreferences.Editor editor = shp.edit();
                 if (viewType) {
                     recyclerView.setAdapter(myAdapter1);
+                    recyclerView.addItemDecoration(dividerItemDecoration);
                     editor.putBoolean(IS_USING_CARD_VIEW, false);
                 } else {
                     recyclerView.setAdapter(myAdapter2);
+                    recyclerView.removeItemDecoration(dividerItemDecoration);
                     editor.putBoolean(IS_USING_CARD_VIEW, true);
                 }
                 editor.apply();
@@ -114,6 +124,7 @@ public class WordsFragment extends Fragment {
                     @Override
                     public void onChanged(List<Word> words) {
                         int temp = myAdapter1.getItemCount();
+                        allWords = words;
                         if (temp != words.size()) {
                             myAdapter1.submitList(words);
                             myAdapter2.submitList(words);
@@ -152,24 +163,88 @@ public class WordsFragment extends Fragment {
         });
         SharedPreferences shp = requireActivity().getSharedPreferences(VIEW_TYPE_SHP, Context.MODE_PRIVATE);
         boolean viewType = shp.getBoolean(IS_USING_CARD_VIEW, false);
+        dividerItemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
         if (viewType) {
             recyclerView.setAdapter(myAdapter2);
         } else {
             recyclerView.setAdapter(myAdapter1);
+            recyclerView.addItemDecoration(dividerItemDecoration);
         }
         filteredWords = wordViewModel.getAllWords();
         filteredWords.observe(getViewLifecycleOwner(), new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
                 int temp = myAdapter1.getItemCount();
+                allWords = words;
                 if (temp != words.size()) {
-                    recyclerView.smoothScrollBy(0, -200);
+                    if (temp < words.size() && !undoAction) {
+                        recyclerView.smoothScrollBy(0, -200);
+                    }
+                    undoAction = false;
                     myAdapter1.submitList(words);
                     myAdapter2.submitList(words);
                 }
             }
         });
-        floatingActionButton = requireActivity().findViewById(R.id.floatingActionButton);
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START | ItemTouchHelper.END) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                final Word wordToDelete = allWords.get(viewHolder.getAdapterPosition());
+                wordViewModel.deleteWords(wordToDelete);
+                Snackbar.make(requireActivity().findViewById(R.id.wordsFragmentView), "删除了一个词汇", Snackbar.LENGTH_SHORT)
+                        .setAction("撤销", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                wordViewModel.insertWords(wordToDelete);
+                                undoAction = true;
+                            }
+                        })
+                        .show();
+            }
+
+            Drawable icon = ContextCompat.getDrawable(requireActivity(),R.drawable.ic_delete_forever_black_24dp);
+            Drawable background = new ColorDrawable(Color.LTGRAY);
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                View itemView = viewHolder.itemView;
+                int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+
+                int iconLeft,iconRight,iconTop,iconBottom;
+                int backTop,backBottom,backLeft,backRight;
+                backTop = itemView.getTop();
+                backBottom = itemView.getBottom();
+                iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) /2;
+                iconBottom = iconTop + icon.getIntrinsicHeight();
+                if (dX > 0) {
+                    backLeft = itemView.getLeft();
+                    backRight = itemView.getLeft() + (int)dX;
+                    background.setBounds(backLeft,backTop,backRight,backBottom);
+                    iconLeft = itemView.getLeft() + iconMargin ;
+                    iconRight = iconLeft + icon.getIntrinsicWidth();
+                    icon.setBounds(iconLeft,iconTop,iconRight,iconBottom);
+                } else if (dX < 0){
+                    backRight = itemView.getRight();
+                    backLeft = itemView.getRight() + (int)dX;
+                    background.setBounds(backLeft,backTop,backRight,backBottom);
+                    iconRight = itemView.getRight()  - iconMargin;
+                    iconLeft = iconRight - icon.getIntrinsicWidth();
+                    icon.setBounds(iconLeft,iconTop,iconRight,iconBottom);
+                } else {
+                    background.setBounds(0,0,0,0);
+                    icon.setBounds(0,0,0,0);
+                }
+                background.draw(c);
+                icon.draw(c);
+            }
+        }).attachToRecyclerView(recyclerView);
+
+        FloatingActionButton floatingActionButton = requireActivity().findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
